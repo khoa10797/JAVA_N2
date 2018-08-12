@@ -1,0 +1,48 @@
+plugins{
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group 'QuanLySinhVien'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+jar {
+    doFirst {
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    exclude('META-INF/*.SF')
+    exclude('META-INF/*.DSA')
+    exclude('META-INF/*.RSA')
+
+    manifest {
+        attributes 'Main-Class': 'Entry'
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc
+    compile 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
+    testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.1.jre8-preview'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+def mainClassName = "app.Entry"
+
+shadowJar {
+    destinationDir = new File("out")
+
+    classifier = "fat"
+    archiveName = "qlsv.${extension}"
+    manifest {
+        attributes "Main-Class": mainClassName
+    }
+}
